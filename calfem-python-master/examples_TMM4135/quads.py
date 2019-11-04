@@ -81,35 +81,8 @@ def quad4e(ex, ey, D, th, eq=None):
     '''
     Nytt forsøk under
     '''
-    tmp1 = np.array([[1, ex[0], ey[0]],
-                     [1, ex[1], ey[1]],
-                     [1, ex[2], ey[2]]])
 
-    tmp2 = np.array([[1, ex[2], ey[2]],
-                     [1, ex[3], ey[3]],
-                     [1, ex[0], ey[0]]])
-
-    A1 = np.linalg.det(tmp1)
-    A2 = np.linalg.det(tmp2)
-
-    A = A1 / 2 + A2 / 2
-
-    B = np.array(np.zeros((3, 8)))
-    Ke = np.array(np.zeros((8, 8)))
-    for i in range(-1,1,1):
-        for j in range(-1,1,1):
-            B = getB(ex, ey, i*0.7745966, j*0.7745966)
-            J  = getJacobi(ex,ey , i*0.7745966, j*0.7745966)
-            Jdet = np.linalg.det(J)
-            if i == 0:
-                H1 = 0.888888
-            else:
-                H1 = 0.555555
-            if j == 0:
-                H2 = 0.888888
-            else:
-                H2 = 0.555555
-            Ke = Ke + (B.T @ D @ B) * Jdet * th * H1 * H2 * 1
+    Ke = KeIntegral(0,1,0,1,ex, ey, D)
 
     # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
@@ -286,5 +259,21 @@ def quad9e(ex, ey, D, th, eq=None):
 def funct(x,y):
     return x*y
 
-def dIntegral(f,x_0,x_1,y_0,y_1):
-    return f(x_0,y_0)
+def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D):
+    Ke = np.array(np.zeros((8,8)))
+    value = [0,0.7777]
+    weight = [0.8888,0.5555]
+
+    for i in range(len(value)):
+        test = -value[i]
+        if test not in value:
+            value.append(test)
+            weight.append(weight[i])
+
+    for i in range(len(value)):
+        for j in range(len(value)):
+            B = getB(ex,ey,value[i], value[j])
+            J = getJacobi(ex,ey,value[i], value[j])
+            Ke += weight[i] * weight [j] * B.T @ D @ B * np.linalg.det(J)
+
+    return Ke

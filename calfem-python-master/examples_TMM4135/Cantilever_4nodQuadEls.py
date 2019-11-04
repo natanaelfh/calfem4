@@ -9,7 +9,6 @@ import calfem.core as cfc
 import quads as quads
 import calfem.vis as cfv
 
-print(quads.dIntegral(quads.funct,1,2,2,1))
 
 nElx = 10
 nEly = 10
