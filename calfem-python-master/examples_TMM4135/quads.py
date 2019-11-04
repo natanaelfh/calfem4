@@ -220,15 +220,20 @@ def getN_y(ex, ey, epsilon, eta):
     return N_y / (x_epsilon * y_eta - x_eta * y_epsilon)
 
 
+def getN_eta_epsilon_mat(epsilon, eta):
+    n_eta = getN_eta(epsilon)
+    n_epsilon = getN_epsilon(eta)
+    mat = np.array([n_epsilon,n_eta])
+    return mat
+
+
 def getB(ex,ey,epsilon,eta):
     B = np.array(np.zeros((3, 2 * len(ex))))
     J = getJacobi(ex,ey,epsilon,eta)
     N_eta = getN_eta(epsilon)
     N_epsilon = getN_epsilon(eta)
-    Nvec = np.array([N_epsilon,N_eta])
+    Nvec = getN_eta_epsilon_mat(epsilon,eta)
     Jinv = np.linalg.inv(J)
-    N_x= getN_x(ex,ey,epsilon,eta)
-    N_y = getN_y(ex,ey,epsilon,eta)
     Nxyvec = Jinv@Nvec
     for i in range(3):
         if i == 0:
