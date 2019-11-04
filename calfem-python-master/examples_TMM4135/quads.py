@@ -239,7 +239,7 @@ def getB(ex,ey,epsilon,eta):
     return B
 
 h = 5
-h = 8
+h = 99
 
 def getJacobi(ex,ey, epsilon, eta):
     x_epsilon = getx_epsilon(ex,ey,eta)
