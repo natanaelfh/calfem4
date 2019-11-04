@@ -127,7 +127,7 @@ def quad4e(ex, ey, D, th, eq=None):
 
         return Ke, fe
 
-def getN(ex, ey, epsilon, eta):
+def getN(epsilon, eta):
     N = np.array(np.zeros(1, 4))
     N[0] = 0.25 * (1+epsilon)*(1+eta)
     N[1] = 0.25 * (1-epsilon)*(1+eta)
@@ -136,7 +136,7 @@ def getN(ex, ey, epsilon, eta):
 
 
 
-def getN_eta(ex, ey, epsilon):
+def getN_eta(epsilon):
     N_eta = np.array(np.zeros(4))
     N_eta[0] = 0.25 * (1 + epsilon)
     N_eta[1] = 0.25 * (1 - epsilon)
@@ -146,7 +146,7 @@ def getN_eta(ex, ey, epsilon):
     return N_eta
 
 
-def getN_epsilon(ex, ey, eta):
+def getN_epsilon(eta):
     N_epsilon = np.array(np.zeros(4))
     N_epsilon[0] = 0.25 * (1 + eta)
     N_epsilon[1] = -0.25 * (1 + eta)
@@ -157,7 +157,7 @@ def getN_epsilon(ex, ey, eta):
 
 
 def gety_eta(ex, ey, epsilon):
-    N_eta = getN_eta(ex, ey, epsilon)
+    N_eta = getN_eta(epsilon)
     y_eta = 0.0
     for i in range(len(ey)):
         y_eta += N_eta[i] * ey[i]
@@ -165,7 +165,7 @@ def gety_eta(ex, ey, epsilon):
 
 
 def gety_epsilon(ex, ey, eta):
-    N_epsilon = getN_epsilon(ex, ey, eta)
+    N_epsilon = getN_epsilon(eta)
     y_epsilon = 0.0
     for i in range(len(ey)):
         y_epsilon += N_epsilon[i] * ey[i]
@@ -173,7 +173,7 @@ def gety_epsilon(ex, ey, eta):
 
 
 def getx_eta(ex, ey, epsilon):
-    N_eta = getN_eta(ex, ey, epsilon)
+    N_eta = getN_eta(epsilon)
     x_eta = 0.0
     for i in range(len(ex)):
         x_eta += N_eta[i] * ex[i]
@@ -181,7 +181,7 @@ def getx_eta(ex, ey, epsilon):
 
 
 def getx_epsilon(ex, ey, eta):
-    N_epsilon = getN_epsilon(ex, ey, eta)
+    N_epsilon = getN_epsilon(eta)
     x_epsilon = 0.0
     for i in range(len(ex)):
         x_epsilon += N_epsilon[i] * ex[i]
@@ -195,8 +195,8 @@ def getN_x(ex, ey, epsilon, eta):
     x_eta = getx_eta(ex, ey, epsilon)
     x_epsilon = getx_epsilon(ex, ey, eta)
 
-    N_epsilon = getN_epsilon(ex, ey, eta)
-    N_eta = getN_eta(ex, ey, epsilon)
+    N_epsilon = getN_epsilon(eta)
+    N_eta = getN_eta(epsilon)
 
     for i in range(len(ex)):
         N_x[i] = y_eta * N_epsilon[i] - y_epsilon * N_eta[i]
@@ -211,8 +211,8 @@ def getN_y(ex, ey, epsilon, eta):
     x_eta = getx_eta(ex, ey, epsilon)
     x_epsilon = getx_epsilon(ex, ey, eta)
 
-    N_epsilon = getN_epsilon(ex, ey, eta)
-    N_eta = getN_eta(ex, ey, epsilon)
+    N_epsilon = getN_epsilon(eta)
+    N_eta = getN_eta(epsilon)
 
     for i in range(len(ey)):
         N_y[i] = x_epsilon * N_eta[i] - x_eta * N_epsilon[i]
@@ -222,20 +222,25 @@ def getN_y(ex, ey, epsilon, eta):
 
 def getB(ex,ey,epsilon,eta):
     B = np.array(np.zeros((3, 2 * len(ex))))
-    N_x = getN_x(ex, ey, epsilon, eta)
-    N_y = getN_y(ex, ey, epsilon, eta)
-
+    J = getJacobi(ex,ey,epsilon,eta)
+    N_eta = getN_eta(epsilon)
+    N_epsilon = getN_epsilon(eta)
+    Nvec = np.array([N_epsilon,N_eta])
+    Jinv = np.linalg.inv(J)
+    N_x= getN_x(ex,ey,epsilon,eta)
+    N_y = getN_y(ex,ey,epsilon,eta)
+    Nxyvec = Jinv@Nvec
     for i in range(3):
         if i == 0:
             for j in range(4):
-                B[i, 2*j] = N_x[j]
+                B[i, 2*j] = Nxyvec[0,j]
         if i == 1:
             for j in range(4):
-                B[i, 2*j +1] = N_y[j]
+                B[i, 2*j +1] = Nxyvec[1,j]
         if i == 2:
             for j in range(4):
-                B[i, 2*j] = N_y[j]
-                B[i, 2*j +1] = N_x[j]
+                B[i, 2*j] = Nxyvec[1,j]
+                B[i, 2*j +1] = Nxyvec[0,j]
     return B
 
 
