@@ -10,18 +10,18 @@ import triangles as tri
 import calfem.vis as cfv
 
 
-nElx = 30
-nEly = 15
+nElx = 50
+nEly = 50
 
 bDrawMesh = True
 
 # Cantilever with dimensions H x L x thickness
-H = 2.5
-L = 12.5
-thickness = 0.1
+H = 2
+L = 10
+thickness = 0.5
 
 # Distributed load in x and y
-eq = np.array([2.0, 0.0])
+eq = np.array([20.0, 0.0])
 eqTotal = eq * L * H * thickness
 
 # Material properties and thickness
@@ -32,7 +32,7 @@ nu = 0.3
 Dmat = np.array([
     [1.0, nu, 0.],
     [nu, 1.0, 0.],
-    [0., 0., (1.0 - nu) / 2.0]]) * E / (1.0 - nu ** 2)
+    [0., 0., 1/2.0*(1+nu)]]) * E / (1.0 - nu ** 2)
 
 nEls = nElx * nEly * 2
 nNodx = nElx + 1

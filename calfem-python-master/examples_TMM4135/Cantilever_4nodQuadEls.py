@@ -10,25 +10,25 @@ import quads as quads
 import calfem.vis as cfv
 
 
-nElx = 10
-nEly = 10
+nElx = 50
+nEly = 50
 
 bDrawMesh = True
 
 # Cantilever with dimensions H x L x thickness
-H         = 5
-L         = 20
+H         = 2
+L         = 10
 thickness = 0.5
 
 # Distributed load in x and y
-eq = np.array([1.0, 0.0])
+eq = np.array([20.0, 0.0])
 eqTotal = eq * L * H * thickness
 
 # Material properties and thickness
 
 ep = [1,thickness]
-E  = 30e6
-nu = 0.25
+E = 2.1e11
+nu = 0.3
 Dmat = np.array([
         [ 1.0,  nu,  0.],
         [  nu, 1.0,  0.],

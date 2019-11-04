@@ -82,7 +82,7 @@ def quad4e(ex, ey, D, th, eq=None):
     Nytt forsøk under
     '''
 
-    Ke = KeIntegral(0,1,0,1,ex, ey, D)
+    Ke = KeIntegral(0,1,0,1,ex, ey, D, th)
 
     # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
@@ -259,7 +259,7 @@ def quad9e(ex, ey, D, th, eq=None):
 def funct(x,y):
     return x*y
 
-def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D):
+def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D, th):
     Ke = np.array(np.zeros((8,8)))
     value = [0,0.7777]
     weight = [0.8888,0.5555]
@@ -274,6 +274,6 @@ def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D):
         for j in range(len(value)):
             B = getB(ex,ey,value[i], value[j])
             J = getJacobi(ex,ey,value[i], value[j])
-            Ke += weight[i] * weight [j] * B.T @ D @ B * np.linalg.det(J)
+            Ke += weight[i] * weight [j] * B.T @ D @ B * np.linalg.det(J) * th
 
     return Ke
