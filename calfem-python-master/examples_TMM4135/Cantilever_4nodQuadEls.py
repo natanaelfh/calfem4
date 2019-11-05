@@ -13,6 +13,8 @@ import calfem.vis as cfv
 Q = quads.KeIntegral(1,1,1,1)
 print(Q)
 
+test
+
 nElx = 30
 nEly = 40
 
