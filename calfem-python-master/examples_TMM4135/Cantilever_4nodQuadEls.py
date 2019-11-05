@@ -10,8 +10,11 @@ import quads as quads
 import calfem.vis as cfv
 
 
-nElx = 50
-nEly = 50
+Q = quads.KeIntegral(1,1,1,1)
+print(Q)
+
+nElx = 30
+nEly = 40
 
 bDrawMesh = True
 

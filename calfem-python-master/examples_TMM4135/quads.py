@@ -82,7 +82,7 @@ def quad4e(ex, ey, D, th, eq=None):
     Nytt forsøk under
     '''
 
-    Ke = KeIntegral(0,1,0,1,ex, ey, D, th)
+    Ke = KeIntegral(ex, ey, D, th)
 
     # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
@@ -95,8 +95,8 @@ def quad4e(ex, ey, D, th, eq=None):
         for i in range(4):
             j = cyclic[(i + 1) % 4]
             k = cyclic[(i + 3) % 4]
-            fe[2*i] = eq[0] * th * 2
-            fe[2*i + 1] = eq[1] * th * 2
+            fe[2 * i + 0] = eq[0] * th * (abs(ey[i] - ey[j]) / 2 + abs(ey[k] - ey[i]) / 2)
+            fe[2 * i + 1] = eq[1] * th * (abs(ex[i] - ex[j]) / 2 + abs(ex[k] - ex[i]) / 2)
 
         return Ke, fe
 
@@ -256,10 +256,8 @@ def quad9e(ex, ey, D, th, eq=None):
     else:
         return Ke, fe
 
-def funct(x,y):
-    return x*y
 
-def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D, th):
+def KeIntegral(ex, ey, D, th):
     Ke = np.array(np.zeros((8,8)))
     value = [0,0.7777]
     weight = [0.8888,0.5555]
@@ -272,8 +270,18 @@ def KeIntegral(x_0,x_1,y_0,y_1, ex, ey, D, th):
 
     for i in range(len(value)):
         for j in range(len(value)):
-            B = getB(ex,ey,value[i], value[j])
-            J = getJacobi(ex,ey,value[i], value[j])
-            Ke += weight[i] * weight [j] * B.T @ D @ B * np.linalg.det(J) * th
+            # B = getB(ex,ey,value[i], value[j])
+            # J = getJacobi(ex,ey,value[i], value[j])
+            # Q = np.linalg.det(J)
+            # Ke += weight[i] * weight[j] * B.T @ D@B * np.linalg.det(J) * th
+
+            Ke += weight[i] * weight[j] * KeIntegrand(ex,ey,D,th,value[i],value[j])
 
     return Ke
+
+def KeIntegrand(ex,ey,D,th,epsilon,eta):
+    B = getB(ex,ey,epsilon, eta)
+    J = getJacobi(ex,ey,epsilon,eta)
+
+    Kint = (B.T @ D @ B * np.linalg.det(J) * th)
+    return Kint
