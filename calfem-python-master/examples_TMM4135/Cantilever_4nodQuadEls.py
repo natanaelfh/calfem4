@@ -9,7 +9,7 @@ import calfem.core as cfc
 import quads as quads
 import calfem.vis as cfv
 
-nElx = 20
+nElx = 10
 nEly = 1
 
 bDrawMesh = True

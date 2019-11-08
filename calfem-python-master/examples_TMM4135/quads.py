@@ -89,7 +89,7 @@ def quad4e(ex, ey, D, th, eq=None):
     print(x, y)
     fe = np.array(np.zeros((8, 1)))
     #gjør sånt at den returnerer fe sammen med Ke, derretter ser om eq = none og returener Ke og Fe logisk
-    Ke, fe = KeIntegral(ex, ey, D, th)
+    Ke = KeIntegral(ex, ey, D, th)
 
     # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
@@ -99,11 +99,8 @@ def quad4e(ex, ey, D, th, eq=None):
         return Ke
     else:
         fe = np.array(np.zeros((8, 1)))
-        for i in range(4):
-            j = cyclic[(i + 1) % 4]
-            k = cyclic[(i + 3) % 4]
-            fe[2 * i + 0] = eq[0] * th * (abs(ey[i] - ey[j]) / 2 + abs(ey[k] - ey[i]) / 2)
-            fe[2 * i + 1] = eq[1] * th * (abs(ex[i] - ex[j]) / 2 + abs(ex[k] - ex[i]) / 2)
+
+        fe = getFe(ex,ey,th,eq)
 
         return Ke, fe
 
@@ -253,6 +250,35 @@ def KeIntegral(ex, ey, D, th):
             Ke += weight[i] * weight[j] * KeIntegrand(ex, ey, D, th, value[i], value[j])
 
     return Ke
+
+def getFe(ex,ey,th,eq):
+    value = [0.0, 0.774597]
+    weight = [0.88889, 0.555556]
+    Fe = np.array(np.zeros((8,1)))
+    q = np.array([eq])
+    q = q.T
+
+    for i in range(len(value)):
+        test = -value[i]
+        if test not in value:
+            value.append(test)
+            weight.append(weight[i])
+
+    for i in range(len(value)):
+        for j in range(len(value)):
+            J = getJacobi(ex, ey, value[i], value[j])
+            Nvec= getN(value[i], value[j])
+            N2 = np.array([[Nvec[0],0,Nvec[1],0,Nvec[2],0, Nvec[3],0],
+                           [0,Nvec[0],0,Nvec[1],0,Nvec[2],0, Nvec[3]]])
+            N2 = N2.T
+
+
+
+            Fe += N2 @ q * np.linalg.det(J) * weight[i] * weight[j] * th
+
+
+
+    return Fe
 
 
 def KeIntegrand(ex, ey, D, th, epsilon, eta):
