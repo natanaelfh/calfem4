@@ -9,20 +9,14 @@ import calfem.core as cfc
 import quads as quads
 import calfem.vis as cfv
 
-
-Q = quads.KeIntegral(1,1,1,1)
-print(Q)
-
-
-
-nElx = 30
-nEly = 40
+nElx = 20
+nEly = 1
 
 bDrawMesh = True
 
 # Cantilever with dimensions H x L x thickness
 H         = 2
-L         = 10
+L         = 20
 thickness = 0.5
 
 # Distributed load in x and y
@@ -37,7 +31,7 @@ nu = 0.3
 Dmat = np.array([
         [ 1.0,  nu,  0.],
         [  nu, 1.0,  0.],
-        [  0.,  0., 1/2.0*(1+nu)]]) * E/(1.0-nu**2)
+        [  0.,  0., 1/(2.0*(1+nu))]]) * E/(1.0-nu**2)
 
 nEls = nElx * nEly
 nNodx = nElx +1
@@ -127,6 +121,9 @@ for iel in range(nEls):
     cfc.assem(eldofs[iel],K,K_el,R,f_el)
 
 r, R0 = cfc.solveq(K,R,bc)
+
+if K.T.all() == K.all():
+    print("JA")
 
 sum = []
 for j in range(len(K[0])):

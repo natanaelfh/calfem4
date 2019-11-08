@@ -82,7 +82,14 @@ def quad4e(ex, ey, D, th, eq=None):
     Nytt forsøk under
     '''
 
-    Ke = KeIntegral(ex, ey, D, th)
+    N = getN(0, 0)
+    x = N @ ex
+    y = N @ ey
+
+    print(x, y)
+    fe = np.array(np.zeros((8, 1)))
+    #gjør sånt at den returnerer fe sammen med Ke, derretter ser om eq = none og returener Ke og Fe logisk
+    Ke, fe = KeIntegral(ex, ey, D, th)
 
     # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
@@ -91,7 +98,7 @@ def quad4e(ex, ey, D, th, eq=None):
     if eq is None:
         return Ke
     else:
-        fe = np.array(np.zeros((8,1)))
+        fe = np.array(np.zeros((8, 1)))
         for i in range(4):
             j = cyclic[(i + 1) % 4]
             k = cyclic[(i + 3) % 4]
@@ -100,31 +107,33 @@ def quad4e(ex, ey, D, th, eq=None):
 
         return Ke, fe
 
-def getN(epsilon, eta):
-    N = np.array(np.zeros(1, 4))
-    N[0] = 0.25 * (1+epsilon)*(1+eta)
-    N[1] = 0.25 * (1-epsilon)*(1+eta)
-    N[2] = 0.25 * (1-epsilon)*(1-eta)
-    N[3] = 0.25 * (1+epsilon)*(1-eta)
 
+def getN(epsilon, eta):
+    N = np.array(np.zeros(4))
+    N[0] = 0.25 * (1 - epsilon) * (1 - eta)
+    N[1] = 0.25 * (1 + epsilon) * (1 - eta)
+    N[2] = 0.25 * (1 + epsilon) * (1 + eta)
+    N[3] = 0.25 * (1 - epsilon) * (1 + eta)
+
+    return N
 
 
 def getN_eta(epsilon):
     N_eta = np.array(np.zeros(4))
-    N_eta[0] = 0.25 * (1 + epsilon)
-    N_eta[1] = 0.25 * (1 - epsilon)
-    N_eta[2] = -0.25 * (1 - epsilon)
-    N_eta[3] = -0.25 * (1 + epsilon)
+    N_eta[0] = -0.25 * (1 - epsilon)
+    N_eta[1] = -0.25 * (1 + epsilon)
+    N_eta[2] = 0.25 * (1 + epsilon)
+    N_eta[3] = 0.25 * (1 - epsilon)
 
     return N_eta
 
 
 def getN_epsilon(eta):
     N_epsilon = np.array(np.zeros(4))
-    N_epsilon[0] = 0.25 * (1 + eta)
-    N_epsilon[1] = -0.25 * (1 + eta)
-    N_epsilon[2] = -0.25 * (1 - eta)
-    N_epsilon[3] = 0.25 * (1 - eta)
+    N_epsilon[0] = -0.25 * (1 - eta)
+    N_epsilon[1] = 0.25 * (1 - eta)
+    N_epsilon[2] = 0.25 * (1 + eta)
+    N_epsilon[3] = -0.25 * (1 + eta)
 
     return N_epsilon
 
@@ -161,74 +170,40 @@ def getx_epsilon(ex, ey, eta):
     return x_epsilon
 
 
-def getN_x(ex, ey, epsilon, eta):
-    N_x = np.array(np.zeros(4))
-    y_eta = gety_eta(ex, ey, epsilon)
-    y_epsilon = gety_epsilon(ex, ey, eta)
-    x_eta = getx_eta(ex, ey, epsilon)
-    x_epsilon = getx_epsilon(ex, ey, eta)
-
-    N_epsilon = getN_epsilon(eta)
-    N_eta = getN_eta(epsilon)
-
-    for i in range(len(ex)):
-        N_x[i] = y_eta * N_epsilon[i] - y_epsilon * N_eta[i]
-
-    return N_x / (x_epsilon * y_eta - x_eta * y_epsilon)
-
-
-def getN_y(ex, ey, epsilon, eta):
-    N_y = np.array(np.zeros(4))
-    y_eta = gety_eta(ex, ey, epsilon)
-    y_epsilon = gety_epsilon(ex, ey, eta)
-    x_eta = getx_eta(ex, ey, epsilon)
-    x_epsilon = getx_epsilon(ex, ey, eta)
-
-    N_epsilon = getN_epsilon(eta)
-    N_eta = getN_eta(epsilon)
-
-    for i in range(len(ey)):
-        N_y[i] = x_epsilon * N_eta[i] - x_eta * N_epsilon[i]
-
-    return N_y / (x_epsilon * y_eta - x_eta * y_epsilon)
-
-
 def getN_eta_epsilon_mat(epsilon, eta):
     n_eta = getN_eta(epsilon)
     n_epsilon = getN_epsilon(eta)
-    mat = np.array([n_epsilon,n_eta])
+    mat = np.array([n_epsilon, n_eta])
     return mat
 
 
-def getB(ex,ey,epsilon,eta):
+def getB(ex, ey, epsilon, eta):
     B = np.array(np.zeros((3, 2 * len(ex))))
-    J = getJacobi(ex,ey,epsilon,eta)
-    N_eta = getN_eta(epsilon)
-    N_epsilon = getN_epsilon(eta)
-    Nvec = getN_eta_epsilon_mat(epsilon,eta)
+    J = getJacobi(ex, ey, epsilon, eta)
+    Nvec = getN_eta_epsilon_mat(epsilon, eta)
     Jinv = np.linalg.inv(J)
-    Nxyvec = Jinv@Nvec
+    Nxyvec = Jinv @ Nvec
     for i in range(3):
         if i == 0:
             for j in range(4):
-                B[i, 2*j] = Nxyvec[0,j]
+                B[i, 2 * j] = Nxyvec[0, j]
         if i == 1:
             for j in range(4):
-                B[i, 2*j +1] = Nxyvec[1,j]
+                B[i, 2 * j + 1] = Nxyvec[1, j]
         if i == 2:
             for j in range(4):
-                B[i, 2*j] = Nxyvec[1,j]
-                B[i, 2*j +1] = Nxyvec[0,j]
+                B[i, 2 * j] = Nxyvec[1, j]
+                B[i, 2 * j + 1] = Nxyvec[0, j]
     return B
 
 
-def getJacobi(ex,ey, epsilon, eta):
-    x_epsilon = getx_epsilon(ex,ey,eta)
+def getJacobi(ex, ey, epsilon, eta):
+    x_epsilon = getx_epsilon(ex, ey, eta)
     x_eta = getx_eta(ex, ey, epsilon)
-    y_epsilon = gety_epsilon(ex,ey, eta)
+    y_epsilon = gety_epsilon(ex, ey, eta)
     y_eta = gety_eta(ex, ey, epsilon)
 
-    jacobi = np.array([[x_epsilon, y_epsilon],[x_eta, y_eta]])
+    jacobi = np.array([[x_epsilon, y_epsilon], [x_eta, y_eta]])
 
     return jacobi
 
@@ -258,9 +233,9 @@ def quad9e(ex, ey, D, th, eq=None):
 
 
 def KeIntegral(ex, ey, D, th):
-    Ke = np.array(np.zeros((8,8)))
-    value = [0,0.7777]
-    weight = [0.8888,0.5555]
+    Ke = np.array(np.zeros((8, 8)))
+    value = [0.0, 0.774597]
+    weight = [0.88889, 0.555556]
 
     for i in range(len(value)):
         test = -value[i]
@@ -275,13 +250,14 @@ def KeIntegral(ex, ey, D, th):
             # Q = np.linalg.det(J)
             # Ke += weight[i] * weight[j] * B.T @ D@B * np.linalg.det(J) * th
 
-            Ke += weight[i] * weight[j] * KeIntegrand(ex,ey,D,th,value[i],value[j])
+            Ke += weight[i] * weight[j] * KeIntegrand(ex, ey, D, th, value[i], value[j])
 
     return Ke
 
-def KeIntegrand(ex,ey,D,th,epsilon,eta):
-    B = getB(ex,ey,epsilon, eta)
-    J = getJacobi(ex,ey,epsilon,eta)
+
+def KeIntegrand(ex, ey, D, th, epsilon, eta):
+    B = getB(ex, ey, epsilon, eta)
+    J = getJacobi(ex, ey, epsilon, eta)
 
     Kint = (B.T @ D @ B * np.linalg.det(J) * th)
     return Kint
