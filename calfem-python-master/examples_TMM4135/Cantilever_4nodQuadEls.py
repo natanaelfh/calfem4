@@ -9,8 +9,8 @@ import calfem.core as cfc
 import quads as quads
 import calfem.vis as cfv
 
-nElx = 10
-nEly = 1
+nElx = 40
+nEly = 20
 
 bDrawMesh = True
 
@@ -31,7 +31,7 @@ nu = 0.3
 Dmat = np.array([
         [ 1.0,  nu,  0.],
         [  nu, 1.0,  0.],
-        [  0.,  0., 1/(2.0*(1+nu))]]) * E/(1.0-nu**2)
+        [  0.,  0., (1.0-nu)/2.0]]) * E/(1.0-nu**2)
 
 nEls = nElx * nEly
 nNodx = nElx +1
