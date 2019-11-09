@@ -89,6 +89,19 @@ def zeta_partials_x_and_y(ex, ey):
 
 
 # Functions for 6 node triangle
+'''
+
+  /$$$$$$                                  /$$          
+ /$$__  $$                                | $$          
+| $$  \__/       /$$$$$$$   /$$$$$$   /$$$$$$$  /$$$$$$ 
+| $$$$$$$       | $$__  $$ /$$__  $$ /$$__  $$ /$$__  $$
+| $$__  $$      | $$  \ $$| $$  \ $$| $$  | $$| $$$$$$$$
+| $$  \ $$      | $$  | $$| $$  | $$| $$  | $$| $$_____/
+|  $$$$$$/      | $$  | $$|  $$$$$$/|  $$$$$$$|  $$$$$$$
+ \______/       |__/  |__/ \______/  \_______/ \_______/
+                                                        
+'''
+
 def L_x_y(ex, ey, x, y):
     L_x = np.array((3,1))
     L_y = np.array((3,1))
@@ -202,6 +215,7 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
 
     A = tri6_area(ex, ey)
 
+    B = tri6_Bmatrix(ex,ey,x,y)
 
     Ke = np.array(np.zeros((12, 12)))
 
@@ -216,6 +230,32 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
 
         return Ke, fe
 
+def tri6_getxy(ex,ey,u,v):
+    L1 = -0.5 * (u + v)
+    L2 = 0.5 * (1 + u)
+    L3 = 0.5 * (1 + v)
+    L = np.array([L1,L2,L3])
+
+    x = 0
+    y = 0
+
+    for i in range(3):
+        x += L[i] * ex[i]
+        y += L[i] * ey[i]
+
+    return x,y
+
+def tri6_getuv(xsi,eta):
+    Q1 = 0.25 * (xsi - 1) * (eta - 1)
+    Q2 = -0.25 * (xsi + 1) * (eta - 1)
+    Q3 = 0.25 * (xsi + 1) * (eta + 1)
+    Q4 = -0.25 * (xsi - 1) * (eta + 1)
+
+    Q = np.array([Q1,Q2,Q3,Q4])
+
+    u, v = 0, 0
+
+    #TODO: ikke ferdig her, mangler å lage u og v
 
 def tri6e(ex, ey, D, th, eq=None):
     return tri6_Kmatrix(ex, ey, D, th, eq)
