@@ -183,13 +183,12 @@ def tri6_Bmatrix(ex, ey, x, y):
 
     Bmatrix = np.array(np.zeros((3, 12)))
 
-    for i in range(3):
-        for j in range(6):
-            Bmatrix[i, 2*j] = Nxy[0,j]
+    for j in range(6):
+        Bmatrix[0, 2*j] = Nxy[0,j]
+        Bmatrix[1, 2*j + 1] = Nxy[1,j]
+        Bmatrix[2, 2*j] = Nxy[1,j]
+        Bmatrix[2, 2*j + 1] = Nxy[0, j]
 
-    # TODO: Fylle ut dette ikke ferdig over 08.11.2019
-
-    # TODO: fill out missing parts (or reformulate completely)
 
     return Bmatrix
 
@@ -202,6 +201,7 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
     wInt = np.array([1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     A = tri6_area(ex, ey)
+
 
     Ke = np.array(np.zeros((12, 12)))
 

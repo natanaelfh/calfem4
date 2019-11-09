@@ -20,7 +20,7 @@ L         = 20
 thickness = 0.5
 
 # Distributed load in x and y
-eq = np.array([20.0, 0.0])
+eq = np.array([20.0, 5.0])
 eqTotal = eq * L * H * thickness
 
 # Material properties and thickness
