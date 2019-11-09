@@ -89,6 +89,27 @@ def zeta_partials_x_and_y(ex, ey):
 
 
 # Functions for 6 node triangle
+def L_x_y(ex, ey, x, y):
+    L_x = np.array((3,1))
+    L_y = np.array((3,1))
+    A = tri6_area(ex, ey)
+
+    cyclic = [0, 1, 2]
+    constants = np.array(np.zeros((3, 3)))
+    for i in range(3):
+        j = cyclic[(i + 1) % 3]
+        k = cyclic[(i + 2) % 3]
+        constants[i, 0] = ex[j] * ey[k] - ex[k] * ey[j]
+        constants[i, 1] = ey[j] - ey[k]
+        constants[i, 2] = ex[k] - ex[j]
+
+    for i in range(3):
+        L_x[i] = constants[i,1] / (2*A)
+        L_y[i] = constants[i,2] / (2*A)
+
+    Lxy = np.array([L_x,L_y])
+
+    return Lxy
 
 
 def tri6_area(ex, ey):
@@ -101,11 +122,15 @@ def tri6_area(ex, ey):
     return A
 
 
-def tri6_shape_functions(zeta):
-    cyclic_ijk = [0, 1, 2, 3, 4, 5]  # Cyclic permutation of the nodes i,j,k
-    L = getL(ex)
+def tri6_shape_functions(ex,ey,x,y):
+    L = getL(ex,ey,x,y)
     N6 = np.zeros(6)
-    N6[0] = 6
+    N6[0] = 2 * L[0] * (L[0] - 0.5)
+    N6[1] = 2 * L[1] * (L[1] - 0.5)
+    N6[2] = 2 * L[2] * (L[2] - 0.5)
+    N6[3] = 4 * L[0] * L[1]
+    N6[4] = 4 * L[1] * L[2]
+    N6[5] = 4 * L[2] * L[0]
 
     # TODO: fill out missing parts (or reformulate completely)
 
@@ -134,22 +159,35 @@ def getL(ex,ey,x,y):
 
 
 def tri6_shape_function_partials_x_and_y(ex, ey, x, y):
-    zeta_px, zeta_py = zeta_partials_x_and_y(ex, ey)
+    Lxy = L_x_y(ex, ey, x, y)
+    L = getL(ex,ey,x,y)
+    Nx = np.array(np.zeros((6,1)))
+    Ny = np.array(np.zeros((6,1)))
 
-    N6_px = np.zeros(6)
-    N6_py = np.zeros(6)
+    Nxy = np.array([Nx,Ny])
 
-    cyclic_ijk = [0, 1, 2, 3, 4, 5]  # Cyclic permutation of the nodes i,j,k
+    for i in range(2):
+        Nxy[i,0] = 2 * Lxy[i,0] * (L[0] - 0.5) + 2 * L[0] * Lxy[i,0]
+        Nxy[i,1] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
+        Nxy[i,2] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
+        Nxy[i,3] = 4 * (Lxy[i,0] * L[1] + Lxy[i,1 * L[0]])
+        Nxy[i,4] = 4 * (Lxy[i,1] * L[2] + Lxy[i,2 * L[1]])
+        Nxy[i,5] = 4 * (Lxy[i,2] * L[0] + Lxy[i,0 * L[2]])
 
-    # TODO: fill out missing parts (or reformulate completely)
-
-    return N6_px, N6_py
+    return Nxy
 
 
-def tri6_Bmatrix(zeta, ex, ey):
-    nx, ny = tri6_shape_function_partials_x_and_y(zeta, ex, ey)
+def tri6_Bmatrix(ex, ey, x, y):
+    Nxy = tri6_shape_function_partials_x_and_y(ex,ey,x,y)
 
-    Bmatrix = np.matrix(np.zeros((3, 12)))
+
+    Bmatrix = np.array(np.zeros((3, 12)))
+
+    for i in range(3):
+        for j in range(6):
+            Bmatrix[i, 2*j] = Nxy[0,j]
+
+    # TODO: Fylle ut dette ikke ferdig over 08.11.2019
 
     # TODO: fill out missing parts (or reformulate completely)
 
