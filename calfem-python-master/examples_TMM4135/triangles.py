@@ -238,6 +238,26 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
     else:
         fe = np.array(np.zeros((12, 1)))
 
+        A = tri6_area(ex, ey)
+
+        value = [0.0, 0.774597]
+        weight = [0.88889, 0.555556]
+        q = np.array([eq])
+        q = q.T
+
+        for i in range(len(value)):
+            test = -value[i]
+            if test not in value:
+                value.append(test)
+                weight.append(weight[i])
+        for i in range(len(value)):
+            for j in range(len(value)):
+                u, v = tri6_getuv(value[i], value[j])
+                x, y = tri6_getxy(ex, ey, u, v)
+                Nvec = tri6N(ex,ey,x,y)
+
+
+                fe += Nvec.T @ q * weight[i] * weight[j] * th
         # TODO: fill out missing parts (or reformulate completely)
 
         return Ke, fe
@@ -276,6 +296,14 @@ def tri6_getuv(xsi,eta):
 
 
     return u,v
+
+def tri6N(ex,ey,x,y):
+    N = tri6_shape_functions(ex,ey,x,y)
+    Nvec = np.array(np.zeros((2,12)))
+    for i in range(6):
+        Nvec[0,2*i] = N[i]
+        Nvec[1,2*i +1] = N[i]
+    return Nvec
 
 def tri6e(ex, ey, D, th, eq=None):
     return tri6_Kmatrix(ex, ey, D, th, eq)
