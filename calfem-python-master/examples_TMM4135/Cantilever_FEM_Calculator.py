@@ -12,7 +12,7 @@ import calfem.vis as cfv
 
 # Element Type
 
-numElementNodes = 9  # Valid numbers 3, 4, 6, 9
+numElementNodes = 6  # Valid numbers 3, 4, 6, 9
 
 elTypeInfo= [-1,'Unknown elementtype']
 
@@ -28,8 +28,8 @@ elif numElementNodes == 9:
 
 # Number of nodes: Should be odd numbers in order to handle
 
-numNodesX = 50
-numNodesY = 20
+numNodesX = 3
+numNodesY = 3
 
 # number of patches that will fit a 9 node element
 numPatchX = (numNodesX-1) // 2
@@ -56,7 +56,6 @@ thickness =  0.1
 
 # Distributed load in x and y, load pr unit area
 eq = np.array([0.,1.0e3])
-eq = np.array([0.,0.])
 #End load, Given as resultant
 
 endLoadXY = np.array([0.0,3.0e6])

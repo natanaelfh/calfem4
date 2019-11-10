@@ -103,8 +103,8 @@ def zeta_partials_x_and_y(ex, ey):
 '''
 
 def L_x_y(ex, ey, x, y):
-    L_x = np.array((3,1))
-    L_y = np.array((3,1))
+    L_x = np.array(np.zeros((3,1)))
+    L_y = np.array(np.zeros((3,1)))
     A = tri6_area(ex, ey)
 
     cyclic = [0, 1, 2]
@@ -183,9 +183,9 @@ def tri6_shape_function_partials_x_and_y(ex, ey, x, y):
         Nxy[i,0] = 2 * Lxy[i,0] * (L[0] - 0.5) + 2 * L[0] * Lxy[i,0]
         Nxy[i,1] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
         Nxy[i,2] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
-        Nxy[i,3] = 4 * (Lxy[i,0] * L[1] + Lxy[i,1 * L[0]])
-        Nxy[i,4] = 4 * (Lxy[i,1] * L[2] + Lxy[i,2 * L[1]])
-        Nxy[i,5] = 4 * (Lxy[i,2] * L[0] + Lxy[i,0 * L[2]])
+        Nxy[i,3] = 4 * (Lxy[i,0] * L[1] + Lxy[i,1] * L[0])
+        Nxy[i,4] = 4 * (Lxy[i,1] * L[2] + Lxy[i,2] * L[1])
+        Nxy[i,5] = 4 * (Lxy[i,2] * L[0] + Lxy[i,0] * L[2])
 
     return Nxy
 
@@ -207,19 +207,31 @@ def tri6_Bmatrix(ex, ey, x, y):
 
 
 def tri6_Kmatrix(ex, ey, D, th, eq=None):
-    zetaInt = np.array([[0.5, 0.5, 0.0],
-                        [0.0, 0.5, 0.5],
-                        [0.5, 0.0, 0.5]])
-
-    wInt = np.array([1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     A = tri6_area(ex, ey)
 
-    B = tri6_Bmatrix(ex,ey,x,y)
+
 
     Ke = np.array(np.zeros((12, 12)))
 
-    # TODO: fill out missing parts (or reformulate completely)
+    value = [0.0, 0.774597]
+    weight = [0.88889, 0.555556]
+    q = np.array([eq])
+    q = q.T
+
+    for i in range(len(value)):
+        test = -value[i]
+        if test not in value:
+            value.append(test)
+            weight.append(weight[i])
+
+    for i in range(len(value)):
+        for j in range(len(value)):
+            u, v = tri6_getuv(value[i], value[j])
+            x,y = tri6_getxy(ex,ey,u,v) # finner x og y koordinat hvor B skal finnes i for å integrere. gjør dette så jeg slipper å regne på determinanter osv
+            B = tri6_Bmatrix(ex,ey,x,y)
+            Ke += B.T @ D @ B * th * weight[i] * weight [j]
+
 
     if eq is None:
         return Ke
@@ -255,7 +267,15 @@ def tri6_getuv(xsi,eta):
 
     u, v = 0, 0
 
-    #TODO: ikke ferdig her, mangler å lage u og v
+    eu = np.array([-1,1,0,-1])
+    ev = np.array([-1,-1,0,1])
+
+    for i in range(4):
+        u += Q[i]*eu[i]
+        v += Q[i]*ev[i]
+
+
+    return u,v
 
 def tri6e(ex, ey, D, th, eq=None):
     return tri6_Kmatrix(ex, ey, D, th, eq)

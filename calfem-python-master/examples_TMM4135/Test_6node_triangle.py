@@ -39,7 +39,7 @@ ep = [1, th]
 E = 2.1e11
 nu = 0.3
 
-D = np.mat([
+D = np.array([
     [1.0, nu, 0.],
     [nu, 1.0, 0.],
     [0., 0., (1.0 - nu) / 2.0]]) * E / (1.0 - nu ** 2)
@@ -48,12 +48,12 @@ eq = [1.0, 3.0]
 
 # Ke, fe = tri.plante(ex,ey,ep,D,eq)
 
-Ke = np.mat(np.zeros((12, 12)))
-fe = np.mat(np.zeros((12, 1)))
+Ke = np.array(np.zeros((12, 12)))
+fe = np.array(np.zeros((12, 1)))
 
-rigX = np.mat(np.zeros((12, 1)))
-rigY = np.mat(np.zeros((12, 1)))
-rigR = np.mat(np.zeros((12, 1)))
+rigX = np.array(np.zeros((12, 1)))
+rigY = np.array(np.zeros((12, 1)))
+rigR = np.array(np.zeros((12, 1)))
 
 for i in range(6):
     rigX[i * 2, 0] = 1.0
