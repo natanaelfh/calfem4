@@ -218,6 +218,9 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
     weight = [0.88889, 0.555556]
     q = np.array([eq])
     q = q.T
+    J1 = getJ1(ex,ey)
+
+    val = 0
 
     for i in range(len(value)):
         test = -value[i]
@@ -228,9 +231,11 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
     for i in range(len(value)):
         for j in range(len(value)):
             u, v = tri6_getuv(value[i], value[j])
-            x,y = tri6_getxy(ex,ey,u,v) # finner x og y koordinat hvor B skal finnes i for å integrere. gjør dette så jeg slipper å regne på determinanter osv
-            B = tri6_Bmatrix(ex,ey,x,y)
-            Ke += B.T @ D @ B * th * weight[i] * weight [j]
+            B = tri6_Bmatrix(ex,ey,u,v)
+            J2 = getJ2(value[i], value[j])
+            Ke += B.T @ D @ B * th * weight[i] * weight [j] * J1 * J2
+
+            val += gettest() * weight[i] * weight[j] * J1
 
 
     if eq is None:
@@ -239,11 +244,12 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
         fe = np.array(np.zeros((12, 1)))
 
         A = tri6_area(ex, ey)
-
+        J1 = getJ1(ex, ey)
         value = [0.0, 0.774597]
         weight = [0.88889, 0.555556]
         q = np.array([eq])
         q = q.T
+
 
         for i in range(len(value)):
             test = -value[i]
@@ -254,13 +260,16 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
             for j in range(len(value)):
                 u, v = tri6_getuv(value[i], value[j])
                 x, y = tri6_getxy(ex, ey, u, v)
-                Nvec = tri6N(ex,ey,x,y)
+                Nvec = tri6N(ex,ey,u,v)
+                J2 = getJ2(value[i],value[j])
 
-
-                fe += Nvec.T @ q * weight[i] * weight[j] * th
+                fe += Nvec.T @ q * weight[i] * weight[j] * th * J1 * J2
         # TODO: fill out missing parts (or reformulate completely)
 
         return Ke, fe
+
+def gettest():
+    return 1;
 
 def tri6_getxy(ex,ey,u,v):
     L1 = -0.5 * (u + v)
@@ -296,6 +305,28 @@ def tri6_getuv(xsi,eta):
 
 
     return u,v
+def tri6_getuv2(xsi,eta):
+    u = (0.25 * (-1 + 3*xsi - eta*(1+xsi)))
+    v = (0.25 * (-1 +3 * eta - xsi*(1+eta)))
+    return u,v
+
+def getJ1(ex,ey):
+    x1 = ex[0]
+    x2 = ex[1]
+    x3 = ex[2]
+
+    y1 = ey[0]
+    y2 = ey[1]
+    y3 = ey[2]
+
+    J = 0.25 * ((x2-x1)*(y3-y1) - (x3-x1) * (y2 - y1))
+
+    return J
+
+def getJ2(xsi,eta):
+
+    return (0.25 * (2-xsi-eta))
+
 
 def tri6N(ex,ey,x,y):
     N = tri6_shape_functions(ex,ey,x,y)
