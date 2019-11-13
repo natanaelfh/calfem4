@@ -10,18 +10,19 @@ import triangles as tri
 import quads as quad
 import calfem.vis as cfv
 
-# Element Type
-# nu = 0.4
-# E =5
-# Dmat = np.mat([
-#         [ 1.0,  nu,  0.],
-#         [  nu, 1.0,  0.],
-#         [  0.,  0., (1.0-nu)/2.0]]) * E/(1.0-nu**2)
-#
-# ex = np.array([0,1,0])
-# ey = np.array([0,0,1])
-#
-# val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
+#Element Type
+
+nu = 0.4
+E =5
+Dmat = np.mat([
+        [ 1.0,  nu,  0.],
+        [  nu, 1.0,  0.],
+        [  0.,  0., (1.0-nu)/2.0]]) * E/(1.0-nu**2)
+
+ex = np.array([1,0,3])
+ey = np.array([1,0,1])
+
+val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
 
 numElementNodes = 6  # Valid numbers 3, 4, 6, 9
 
@@ -39,8 +40,8 @@ elif numElementNodes == 9:
 
 # Number of nodes: Should be odd numbers in order to handle
 
-numNodesX = 50
-numNodesY = 50
+numNodesX = 3
+numNodesY = 3
 
 # number of patches that will fit a 9 node element
 numPatchX = (numNodesX-1) // 2
@@ -66,10 +67,10 @@ L         = 10.0
 thickness =  1
 
 # Distributed load in x and y, load pr unit area
-eq = np.array([0.,-5.0e3])
+eq = np.array([0.,5.0e10])
 #End load, Given as resultant
 
-endLoadXY = np.array([0.0,0.0])
+endLoadXY = np.array([0.0,1.0])
 #endLoadXY = np.array([3.0e6,0])
 #endLoadXY = np.array([4.2e9,0.0]) # Should give unit disp at Poisson = 0
 
@@ -212,6 +213,9 @@ for iel in range(numElements):
     cfc.assem(eldofs[iel],K,K_el,R,f_el)
 
 r, R0 = cfc.solveq(K,R,bc)
+
+if K.T.all() == K.all():
+    print("JA")
 
 nodMiddle = numNodesY//2 +1  # Mid nod on right edge
 xC = r[-(nodMiddle*2)  ,0] # 2 dofs per node, so this is the middle dof on end

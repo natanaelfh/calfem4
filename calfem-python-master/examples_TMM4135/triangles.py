@@ -235,11 +235,11 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
             J2 = getJ2(value[i], value[j])
             Ke += B.T @ D @ B * th * weight[i] * weight [j] * J1 * J2
 
-            val += gettest() * weight[i] * weight[j] * J1
+            val += gettest(u,v) * weight[i] * weight[j] * J1
 
 
     if eq is None:
-        return Ke
+        return val
     else:
         fe = np.array(np.zeros((12, 1)))
 
@@ -251,24 +251,15 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
         q = q.T
 
 
-        for i in range(len(value)):
-            test = -value[i]
-            if test not in value:
-                value.append(test)
-                weight.append(weight[i])
-        for i in range(len(value)):
-            for j in range(len(value)):
-                u, v = tri6_getuv(value[i], value[j])
-                x, y = tri6_getxy(ex, ey, u, v)
-                Nvec = tri6N(ex,ey,u,v)
-                J2 = getJ2(value[i],value[j])
 
-                fe += Nvec.T @ q * weight[i] * weight[j] * th * J1 * J2
+        fx = A * th * eq[0] / 6.0
+        fy = A * th * eq[1] / 6.0
+        fe = np.array([[fx], [fy], [fx], [fy], [fx], [fy],[fx], [fy], [fx], [fy], [fx], [fy]])
         # TODO: fill out missing parts (or reformulate completely)
 
         return Ke, fe
 
-def gettest():
+def gettest(x,y):
     return 1;
 
 def tri6_getxy(ex,ey,u,v):
@@ -319,13 +310,13 @@ def getJ1(ex,ey):
     y2 = ey[1]
     y3 = ey[2]
 
-    J = 0.25 * ((x2-x1)*(y3-y1) - (x3-x1) * (y2 - y1))
+    J = 0.25 * ((x2-x1)*(y3-y1) - (x3-x1) * (y2 - y1)) /2
 
-    return J
+    return abs(J)
 
 def getJ2(xsi,eta):
 
-    return (0.25 * (2-xsi-eta))
+    return abs(0.25 * (2-xsi-eta))
 
 
 def tri6N(ex,ey,x,y):
