@@ -91,7 +91,6 @@ def quad4e(ex, ey, D, th, eq=None):
     #gjør sånt at den returnerer fe sammen med Ke, derretter ser om eq = none og returener Ke og Fe logisk
     Ke = KeIntegral(ex, ey, D, th)
 
-    # TODO: fill out missing parts (or reformulate completely)
     # Bruk numerisk integrasjon
     cyclic = [0, 1, 2, 3]
 
@@ -205,28 +204,7 @@ def getJacobi(ex, ey, epsilon, eta):
     return jacobi
 
 
-def quad9e(ex, ey, D, th, eq=None):
-    """
-    Compute the stiffness matrix for a four node membrane element.
 
-    :param list ex: element x coordinates [x1, x2, x3]
-    :param list ey: element y coordinates [y1, y2, y3]
-    :param list D : 2D constitutive matrix
-    :param list th: element thickness
-    :param list eq: distributed loads, local directions [bx, by]
-    :return mat Ke: element stiffness matrix [6 x 6]
-    :return mat fe: consistent load vector [6 x 1] (if eq!=None)
-    """
-
-    Ke = np.matrix(np.zeros((18, 18)))
-    fe = np.matrix(np.zeros((18, 1)))
-
-    # TODO: fill out missing parts (or reformulate completely)
-
-    if eq is None:
-        return Ke
-    else:
-        return Ke, fe
 
 
 def KeIntegral(ex, ey, D, th):
@@ -287,3 +265,40 @@ def KeIntegrand(ex, ey, D, th, epsilon, eta):
 
     Kint = (B.T @ D @ B * np.linalg.det(J) * th)
     return Kint
+
+
+
+
+'''
+9E firkant
+9E firkant
+9E firkant
+9E firkant
+9E firkant
+9E firkant
+'''
+
+
+
+def quad9e(ex, ey, D, th, eq=None):
+    """
+    Compute the stiffness matrix for a four node membrane element.
+
+    :param list ex: element x coordinates [x1, x2, x3]
+    :param list ey: element y coordinates [y1, y2, y3]
+    :param list D : 2D constitutive matrix
+    :param list th: element thickness
+    :param list eq: distributed loads, local directions [bx, by]
+    :return mat Ke: element stiffness matrix [6 x 6]
+    :return mat fe: consistent load vector [6 x 1] (if eq!=None)
+    """
+
+    Ke = np.matrix(np.zeros((18, 18)))
+    fe = np.matrix(np.zeros((18, 1)))
+
+    # TODO: fill out missing parts (or reformulate completely)
+
+    if eq is None:
+        return Ke
+    else:
+        return Ke, fe
