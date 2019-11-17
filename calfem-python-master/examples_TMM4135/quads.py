@@ -82,11 +82,11 @@ def quad4e(ex, ey, D, th, eq=None):
     Nytt forsøk under
     '''
 
-    N = getN(0, 0)
-    x = N @ ex
-    y = N @ ey
-
-    print(x, y)
+    # N = getN(0, 0)
+    # x = N @ ex
+    # y = N @ ey
+    #
+    # print(x, y)
     fe = np.array(np.zeros((8, 1)))
     #gjør sånt at den returnerer fe sammen med Ke, derretter ser om eq = none og returener Ke og Fe logisk
     Ke = KeIntegral(ex, ey, D, th)
@@ -297,6 +297,8 @@ def quad9e(ex, ey, D, th, eq=None):
     fe = np.matrix(np.zeros((18, 1)))
 
     # TODO: fill out missing parts (or reformulate completely)
+    #MUlig jeg kan kun endre N vektor og Nxy vektor til å tillate 9 noder også. Må huske at alle N'ene blir forskjellige ikke kun de nye
+    #Tanken er at ved å bruke len(ex) eller noe lighnende kan de resterende funksjonene automatisk lage store nok matriser osv
 
     if eq is None:
         return Ke

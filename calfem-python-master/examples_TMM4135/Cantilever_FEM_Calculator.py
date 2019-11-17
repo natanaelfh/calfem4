@@ -24,7 +24,7 @@ ey = np.array([1,-1,-1])
 
 val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
 
-numElementNodes = 4  # Valid numbers 3, 4, 6, 9
+numElementNodes = 6  # Valid numbers 3, 4, 6, 9
 
 elTypeInfo= [-1,'Unknown elementtype']
 
@@ -70,7 +70,7 @@ thickness =  1
 eq = np.array([5e4,0])
 #End load, Given as resultant
 
-endLoadXY = np.array([0.0,0.0])
+endLoadXY = np.array([0.0,5e5])
 #endLoadXY = np.array([3.0e6,0])
 #endLoadXY = np.array([4.2e9,0.0]) # Should give unit disp at Poisson = 0
 
