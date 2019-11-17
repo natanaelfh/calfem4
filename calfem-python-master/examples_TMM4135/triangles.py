@@ -120,7 +120,7 @@ def L_x_y(ex, ey, x, y):
         L_x[i] = constants[i,1] / (2*A)
         L_y[i] = constants[i,2] / (2*A)
 
-    Lxy = np.array([L_x,L_y])
+    Lxy = np.vstack((L_x.T,L_y.T)).T
 
     return Lxy
 
@@ -172,35 +172,35 @@ def getL(ex,ey,x,y):
 
 
 def tri6_shape_function_partials_x_and_y(ex, ey, x, y):
-    Lxy = L_x_y(ex, ey, x, y)
+    Lxy = L_x_y(ex, ey, x, y).T
     L = getL(ex,ey,x,y)
     Nx = np.array(np.zeros((6,1)))
     Ny = np.array(np.zeros((6,1)))
 
-    Nxy = np.array([Nx,Ny])
+    Nxy = np.hstack((Nx,Ny)).T
 
     for i in range(2):
         Nxy[i,0] = 2 * Lxy[i,0] * (L[0] - 0.5) + 2 * L[0] * Lxy[i,0]
         Nxy[i,1] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
-        Nxy[i,2] = 2 * Lxy[i,1] * (L[1] - 0.5) + 2 * L[1] * Lxy[i,1]
+        Nxy[i,2] = 2 * Lxy[i,2] * (L[2] - 0.5) + 2 * L[2] * Lxy[i,2]
         Nxy[i,3] = 4 * (Lxy[i,0] * L[1] + Lxy[i,1] * L[0])
         Nxy[i,4] = 4 * (Lxy[i,1] * L[2] + Lxy[i,2] * L[1])
         Nxy[i,5] = 4 * (Lxy[i,2] * L[0] + Lxy[i,0] * L[2])
 
-    return Nxy
+    return Nxy.T
 
 
 def tri6_Bmatrix(ex, ey, x, y):
-    Nxy = tri6_shape_function_partials_x_and_y(ex,ey,x,y)
+    Nxy = tri6_shape_function_partials_x_and_y(ex,ey,x,y).T
 
 
     Bmatrix = np.array(np.zeros((3, 12)))
 
     for j in range(6):
-        Bmatrix[0, 2*j] = Nxy[0,j]
-        Bmatrix[1, 2*j + 1] = Nxy[1,j]
-        Bmatrix[2, 2*j] = Nxy[1,j]
-        Bmatrix[2, 2*j + 1] = Nxy[0, j]
+        Bmatrix[0, j*2] = Nxy[0,j]
+        Bmatrix[1, j*2 + 1] = Nxy[1,j]
+        Bmatrix[2, j*2] = Nxy[1,j]
+        Bmatrix[2, j*2 + 1] = Nxy[0, j]
 
 
     return Bmatrix
@@ -231,15 +231,16 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
     for i in range(len(value)):
         for j in range(len(value)):
             u, v = tri6_getuv(value[i], value[j])
-            B = tri6_Bmatrix(ex,ey,u,v)
+            x, y = tri6_getxy(ex,ey,u,v)
+            B = tri6_Bmatrix(ex,ey,x,y)
             J2 = getJ2(value[i], value[j])
             Ke += B.T @ D @ B * th * weight[i] * weight [j] * J1 * J2
 
-            val += gettest(u,v) * weight[i] * weight[j] * J1
+            val += gettest(x,y) * weight[i] * weight[j] * J1 * J2
 
 
     if eq is None:
-        return val
+        return Ke
     else:
         fe = np.array(np.zeros((12, 1)))
 
@@ -260,7 +261,7 @@ def tri6_Kmatrix(ex, ey, D, th, eq=None):
         return Ke, fe
 
 def gettest(x,y):
-    return 1;
+    return x*y;
 
 def tri6_getxy(ex,ey,u,v):
     L1 = -0.5 * (u + v)
@@ -310,13 +311,13 @@ def getJ1(ex,ey):
     y2 = ey[1]
     y3 = ey[2]
 
-    J = 0.25 * ((x2-x1)*(y3-y1) - (x3-x1) * (y2 - y1)) /2
+    J = 0.25 * ((x2-x1)*(y3-y1) - (x3-x1) * (y2 - y1))
 
     return abs(J)
 
 def getJ2(xsi,eta):
 
-    return abs(0.25 * (2-xsi-eta))
+    return (0.25 * (2-xsi-eta))
 
 
 def tri6N(ex,ey,x,y):
