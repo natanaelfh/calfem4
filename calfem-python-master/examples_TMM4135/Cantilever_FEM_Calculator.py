@@ -11,6 +11,40 @@ import quads as quad
 import calfem.vis as cfv
 import coordtransform as ct
 
+
+def getXY():
+    print("Koordinater til X1-X4, med klokken fra nederst i venste hjørne")
+    X = np.array(np.zeros(4))
+    X[0] = float(input())
+    X[1] = float(input())
+    X[2] = float(input())
+    X[3] = float(input())
+    Y = np.array(np.zeros(4))
+    Y[0] = float(input("Samme med Y koordinater"))
+    Y[1] = float(input())
+    Y[2] = float(input())
+    Y[3] = float(input())
+
+    t = float(input("Tykkelse"))
+    n = int(input("Elementtype:\n3 Noders trekant: 3\n6 Noders trekant: 6\n4 Noders Firkant: 4\n9 Noders Firkant: 9\n"))
+
+    nx = int(input("Antall noder x-rettning: "))
+    ny = int(input("Antall noder y-rettning: "))
+
+    eq = np.array(np.zeros(2))
+    f = np.array(np.zeros(2))
+    print("Volum last, x så y:\n")
+
+    eq[0] = float(input())
+    eq[1] = float(input())
+
+    print("Last på andre side, x så y:\n")
+    f[0] = float(input())
+    f[1] = float(input())
+
+    return X.T, Y.T, t, n, nx, ny, eq, f
+
+
 #Element Type
 
 # nu = 0.4
@@ -25,7 +59,9 @@ import coordtransform as ct
 #
 # val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
 
-numElementNodes = 9  # Valid numbers 3, 4, 6, 9
+X,Y, thickness, numElementNodes, numNodesX, numNodesY,eq, endLoadXY = getXY()
+
+#numElementNodes = 9  # Valid numbers 3, 4, 6, 9
 
 elTypeInfo= [-1,'Unknown elementtype']
 
@@ -41,8 +77,8 @@ elif numElementNodes == 9:
 
 # Number of nodes: Should be odd numbers in order to handle
 
-numNodesX = 40
-numNodesY = 40
+#numNodesX = 40
+#numNodesY = 40
 
 # number of patches that will fit a 9 node element
 numPatchX = (numNodesX-1) // 2
@@ -65,10 +101,14 @@ bDrawMesh = True
 # Cantilever with dimensions H x L x thickness
 #H         =  2.0
 #L         = 10.0
-thickness =  1
 
-X = np.array([0,2,2,0]).T
-Y = np.array([0,0,1,0.5]).T
+
+#thickness =  1
+
+#X = np.array([0,-1,0,0]).T
+#Y = np.array([0,0,1,1]).T
+
+
 
 lx = 1 / (numNodesX-1)
 ly = 1 / (numNodesY-1)
@@ -86,10 +126,10 @@ tmp2 = np.linalg.det(tmp2)
 
 area  = tmp1/2 + tmp2 /2
 # Distributed load in x and y, load pr unit area
-eq = np.array([0,0])
+#eq = np.array([0,0])
 #End load, Given as resultant
 
-endLoadXY = np.array([1000000.0,0.0])
+#endLoadXY = np.array([1000000.0,0.0])
 #endLoadXY = np.array([3.0e6,0])
 #endLoadXY = np.array([4.2e9,0.0]) # Should give unit disp at Poisson = 0
 
@@ -278,3 +318,6 @@ if bDrawMesh:
         title=elTypeInfo[1])
 
     cfv.showAndWait()
+
+
+
