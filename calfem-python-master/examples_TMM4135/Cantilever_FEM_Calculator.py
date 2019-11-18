@@ -41,8 +41,8 @@ elif numElementNodes == 9:
 
 # Number of nodes: Should be odd numbers in order to handle
 
-numNodesX = 60
-numNodesY = 60
+numNodesX = 40
+numNodesY = 40
 
 # number of patches that will fit a 9 node element
 numPatchX = (numNodesX-1) // 2
@@ -68,7 +68,7 @@ bDrawMesh = True
 thickness =  1
 
 X = np.array([0,2,2,0]).T
-Y = np.array([0,1,2,1]).T
+Y = np.array([0,0,1,0.5]).T
 
 lx = 1 / (numNodesX-1)
 ly = 1 / (numNodesY-1)
@@ -195,7 +195,7 @@ for iel in range(elnods.shape[0]):
 
 
 # Draw the mesh.
-if not bDrawMesh:
+if bDrawMesh:
     cfv.drawMesh(
         coords=coords,
         edof=eldofs,

@@ -12,9 +12,9 @@ def getN(epsilon,eta):
 
 
 def getCordX(X,Y,px,py):
-    N = getN(px,py)
+    N = getN(2* px-1,2* py-1)
     return X @ N
 
 def getCordY(X,Y,px,py):
-    N = getN(px, py)
+    N = getN(2*px - 1, 2* py -1)
     return Y @ N
