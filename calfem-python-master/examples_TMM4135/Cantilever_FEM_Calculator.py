@@ -63,19 +63,38 @@ else:
 bDrawMesh = True
 
 # Cantilever with dimensions H x L x thickness
-H         =  2.0
-L         = 10.0
+#H         =  2.0
+#L         = 10.0
 thickness =  1
+
+X = np.array([0,2,2,0]).T
+Y = np.array([0,1,2,1]).T
+
+lx = 1 / (numNodesX-1)
+ly = 1 / (numNodesY-1)
+
+tmp1 = np.array([[1, X[0], Y[0]],
+                     [1, X[1], Y[1]],
+                     [1, X[2], Y[2]]])
+
+tmp2 = np.array([[1, X[2], Y[2]],
+                     [1, X[3], Y[3]],
+                     [1, X[0], Y[0]]])
+
+tmp1 = np.linalg.det(tmp1)
+tmp2 = np.linalg.det(tmp2)
+
+area  = tmp1/2 + tmp2 /2
 # Distributed load in x and y, load pr unit area
 eq = np.array([0,0])
 #End load, Given as resultant
 
-endLoadXY = np.array([10000.0,0.0])
+endLoadXY = np.array([1000000.0,0.0])
 #endLoadXY = np.array([3.0e6,0])
 #endLoadXY = np.array([4.2e9,0.0]) # Should give unit disp at Poisson = 0
 
 
-eqTotal = eq * L * H * thickness #Total load for plotting purpose
+eqTotal = eq *area* thickness #Total load for plotting purpose
 
 # Material properties and thickness
 
@@ -92,8 +111,8 @@ numElements = numElementsX * numElementsY
 if numElementNodes in [3,6]:
     numElements *= 2
 
-L_elx = L / (numNodesX-1)
-L_ely = H / (numNodesY-1)
+#L_elx = L / (numNodesX-1)
+#L_ely = H / (numNodesY-1)
 
 nelnod = 6
 
@@ -108,10 +127,18 @@ ndofs = numNodes * 2
 
 # Set the node coordinates and node dofs
 
+
+
+
 for i in range(numNodesX):
     for j in range(numNodesY):
-        coords[inod,0] = L_elx * i
-        coords[inod,1] = L_ely * j
+        #coords[inod,0] = L_elx * i
+        #coords[inod,1] = L_ely * j
+
+        coords[inod, 0] = ct.getCordX(X, Y, lx * i, ly * j)
+        coords[inod, 1] = ct.getCordY(X, Y, lx * i, ly * j)
+
+
         dofs[inod,0] = idof
         dofs[inod,1] = idof+1
         idof += 2
@@ -228,7 +255,7 @@ for i in range(0,(numNodesY*2),2):
     R0Sum[0] += R0[i  ,0]
     R0Sum[1] += R0[i+1,0]
 
-eqTotal = eq * L * H * thickness #Total load for plotting purpose
+eqTotal = eq * area* thickness #Total load for plotting purpose
 print("Total reaction force in x:{:12.3e} y:{:12.3e})".format(R0Sum[0],R0Sum[1]))
 
 # Draw the displacements
@@ -237,7 +264,7 @@ print("Total reaction force in x:{:12.3e} y:{:12.3e})".format(R0Sum[0],R0Sum[1])
 if bDrawMesh:
     disp = np.array(np.zeros((numNodes,2)),'f')
     rMax = max(abs(max(r)),abs(min(r)))
-    scale = 0.15 * L / rMax
+    scale = 0.15 * X[1] / rMax
 
     for i in range( np.size(disp,0)):
         disp[i,0] = r[i*2   ,0] * scale
