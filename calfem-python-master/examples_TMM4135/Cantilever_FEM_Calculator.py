@@ -12,19 +12,19 @@ import calfem.vis as cfv
 
 #Element Type
 
-nu = 0.4
-E =5
-Dmat = np.mat([
-        [ 1.0,  nu,  0.],
-        [  nu, 1.0,  0.],
-        [  0.,  0., (1.0-nu)/2.0]]) * E/(1.0-nu**2)
+# nu = 0.4
+# E =5
+# Dmat = np.mat([
+#         [ 1.0,  nu,  0.],
+#         [  nu, 1.0,  0.],
+#         [  0.,  0., (1.0-nu)/2.0]]) * E/(1.0-nu**2)
+#
+# ex = np.array([0,0,2])
+# ey = np.array([1,-1,-1])
+#
+# val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
 
-ex = np.array([0,0,2])
-ey = np.array([1,-1,-1])
-
-val = tri.tri6_Kmatrix(ex,ey,Dmat, 0.5)
-
-numElementNodes = 6  # Valid numbers 3, 4, 6, 9
+numElementNodes = 9  # Valid numbers 3, 4, 6, 9
 
 elTypeInfo= [-1,'Unknown elementtype']
 
@@ -40,8 +40,8 @@ elif numElementNodes == 9:
 
 # Number of nodes: Should be odd numbers in order to handle
 
-numNodesX = 30
-numNodesY = 30
+numNodesX = 60
+numNodesY = 60
 
 # number of patches that will fit a 9 node element
 numPatchX = (numNodesX-1) // 2
@@ -67,10 +67,10 @@ L         = 10.0
 thickness =  1
 
 # Distributed load in x and y, load pr unit area
-eq = np.array([5e4,0])
+eq = np.array([0,0])
 #End load, Given as resultant
 
-endLoadXY = np.array([0.0,5e5])
+endLoadXY = np.array([10000.0,0.0])
 #endLoadXY = np.array([3.0e6,0])
 #endLoadXY = np.array([4.2e9,0.0]) # Should give unit disp at Poisson = 0
 
@@ -168,7 +168,7 @@ for iel in range(elnods.shape[0]):
 
 
 # Draw the mesh.
-if bDrawMesh:
+if not bDrawMesh:
     cfv.drawMesh(
         coords=coords,
         edof=eldofs,
