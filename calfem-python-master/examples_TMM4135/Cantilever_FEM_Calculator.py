@@ -65,7 +65,7 @@ bDrawMesh = True
 H         =  2.0
 L         = 10.0
 thickness =  1
-
+p = 6
 # Distributed load in x and y, load pr unit area
 eq = np.array([0,0])
 #End load, Given as resultant
