@@ -20,12 +20,12 @@ def getXY():
     X[2] = float(input())
     X[3] = float(input())
     Y = np.array(np.zeros(4))
-    Y[0] = float(input("Samme med Y koordinater"))
+    Y[0] = float(input("Samme med Y koordinater\n"))
     Y[1] = float(input())
     Y[2] = float(input())
     Y[3] = float(input())
 
-    t = float(input("Tykkelse"))
+    t = float(input("Tykkelse\n"))
     n = int(input("Elementtype:\n3 Noders trekant: 3\n6 Noders trekant: 6\n4 Noders Firkant: 4\n9 Noders Firkant: 9\n"))
 
     nx = int(input("Antall noder x-rettning: "))
@@ -33,12 +33,12 @@ def getXY():
 
     eq = np.array(np.zeros(2))
     f = np.array(np.zeros(2))
-    print("Volum last, x så y:\n")
+    print("Volum last, x så y:")
 
     eq[0] = float(input())
     eq[1] = float(input())
 
-    print("Last på andre side, x så y:\n")
+    print("Last på andre side, x så y:")
     f[0] = float(input())
     f[1] = float(input())
 
